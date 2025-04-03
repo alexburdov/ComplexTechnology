@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="Create_person_table" author="BurdovitsinAS" created="03.04.2025">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="person"/>
+            </not>
+        </preConditions>
+        <createTable tableName="person" remarks="Таблица пользователей">
+            <column name="PERSON_ID" type="BIGINT" autoIncrement="true" remarks="ID пользователя">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="LOGIN_NAME" type="VARCHAR(20)" remarks="Login пользователя">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="PASSWORD" type="VARCHAR(20)" remarks="Пароль пользователя">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="IS_ACTIVE" type="BOOLEAN" defaultValue="FALSE" remarks="Если пользователь активен?"/>
+
+            <column name="NAME" type="VARCHAR(100)" remarks="Имя">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="SURNAME" type="VARCHAR(100)" remarks="Фамилия">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="PATRONYMIC" type="VARCHAR(100)" remarks="Отчество"/>
+
+            <column name="DATE_OF_BIRTH" type="DATE" remarks="Дата рождения"/>
+
+            <column name="CREATE_DATE" type="TIMESTAMP" defaultValueComputed="${now}" remarks="Дата добавления">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="UPDATE_DATE" type="TIMESTAMP" defaultValueComputed="${now}" remarks="Дата изменения">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="Comment_person_table" author="BurdovitsinAS" created="03.04.2025">
+        <preConditions onFail="CONTINUE">
+            <tableExists tableName="person"/>
+        </preConditions>
+        <sql>
+            COMMENT
+            ON TABLE person IS 'Таблица пользователей';
+            COMMENT
+            ON COLUMN person.person_id IS 'ID пользователя';
+            COMMENT
+            ON COLUMN person.login_name IS 'Login пользователя';
+            COMMENT
+            ON COLUMN person.password IS 'Пароль пользователя';
+            COMMENT
+            ON COLUMN person.is_active IS 'Если пользователь активен?';
+            COMMENT
+            ON COLUMN person.name IS 'Имя';
+            COMMENT
+            ON COLUMN person.surname IS 'Фамилия';
+            COMMENT
+            ON COLUMN person.patronymic IS 'Отчество';
+            COMMENT
+            ON COLUMN person.date_of_birth IS 'Дата рождения';
+            COMMENT
+            ON COLUMN person.create_date IS 'Дата добавления пользователя';
+            COMMENT
+            ON COLUMN person.update_date IS 'Дата изменения пользователя';
+        </sql>
+    </changeSet>
+
+    <changeSet id="Create_role_table" author="BurdovitsinAS" created="03.04.2025">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="role"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="role" remarks="Список ролей">
+            <column name="ROLE_ID" type="BIGINT" autoIncrement="true" remarks="ID роли">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="ROLE" type="VARCHAR(20)" remarks="Имя роли">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="DESCRIPTION" type="VARCHAR(200)" remarks="Описание роли"/>
+
+            <column name="CREATE_DATE" type="TIMESTAMP" defaultValueComputed="${now}" remarks="Дата добавления">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="UPDATE_DATE" type="TIMESTAMP" defaultValueComputed="${now}" remarks="Дата изменения">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="Comment_role_table" author="BurdovitsinAS" created="03.04.2025">
+        <preConditions onFail="CONTINUE">
+            <tableExists tableName="role"/>
+        </preConditions>
+        <sql>
+            COMMENT
+            ON TABLE role IS 'Таблица ролей';
+            COMMENT
+            ON COLUMN role.role_id IS 'ID роли';
+            COMMENT
+            ON COLUMN role.role IS 'Роль (кодификатор)';
+            COMMENT
+            ON COLUMN role.description IS 'Расширеное описание роли';
+        </sql>
+    </changeSet>
+
+    <changeSet id="Create_person_to_role_relation_table" author="BurdovitsinAS" created="03.04.2025">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="user_role_relation"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="person_to_role_relation" remarks="Связь пользователя с ролью">
+            <column name="PERS_TO_ROLE_ID" type="BIGINT" autoIncrement="true" remarks="ID отношения">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="PERSON_ID" type="BIGINT" remarks="ID пользователя">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ROLE_ID" type="BIGINT" remarks="ID роли">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="ADD_DATE" type="TIMESTAMP" defaultValueComputed="${now}" remarks="Дата добавления роли пользователю">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="DELETE_DATE" type="TIMESTAMP" remarks="Дата удаления роли у пользователя - если Null то роль активна"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="Comment_person_to_role_relation_table" author="BurdovitsinAS" created="03.04.2025">
+        <preConditions onFail="CONTINUE">
+            <tableExists tableName="user_role_relation"/>
+        </preConditions>
+        <sql>
+            COMMENT
+            ON TABLE user_role_relation IS 'Таблица отношения пользователя и роли';
+            COMMENT
+            ON COLUMN user_role_relation.pers_to_role_id IS 'ID отношения';
+            COMMENT
+            ON COLUMN user_role_relation.person_id IS 'ID пользователя';
+            COMMENT
+            ON COLUMN user_role_relation.role_id IS 'ID роли';
+            COMMENT
+            ON COLUMN user_role_relation.add_date IS 'Дата добавления роли пользователю';
+            COMMENT
+            ON COLUMN user_role_relation.delete_date IS 'Дата удаления роли у пользователя - если Null то роль активна';
+        </sql>
+    </changeSet>
+
+    <changeSet id="Create_account_table" author="BurdovitsinAS" created="03.04.2025">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="account"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="account" remarks="Таблица баланса">
+            <column name="ACCOUNT_ID" type="BIGINT" autoIncrement="true" remarks="ID баланса">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="PERSON_ID" type="BIGINT" remarks="ID пользователя">
+                <constraints nullable="false"/>
+            </column>
+            <column name="INIT_BALANCE" type="DECIMAL" defaultValue="0" remarks="Баланс при инициализации">
+                <constraints nullable="false" checkConstraint="CHECK (BALANCE &gt;= 0)"/>
+                <!-- Дублирование ограничений на уровне базы данных. Защитное програмирование -->
+            </column>
+            <column name="BALANCE" type="DECIMAL" defaultValue="0" remarks="Текущий баланс">
+                <constraints nullable="false" checkConstraint="CHECK (BALANCE &gt;= 0)"/>
+                <!-- Дублирование ограничений на уровне базы данных. Защитное програмирование -->
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="Comment_account_table" author="BurdovitsinAS" created="03.04.2025">
+        <preConditions onFail="CONTINUE">
+            <tableExists tableName="account"/>
+        </preConditions>
+        <sql>
+            COMMENT
+            ON TABLE account IS 'Таблица баланса';
+            COMMENT
+            ON COLUMN account.account_id IS 'ID баланса';
+            COMMENT
+            ON COLUMN account.person_id IS 'ID пользователя';
+            COMMENT
+            ON COLUMN account.init_balance IS 'Баланс при инициализации';
+            COMMENT
+            ON COLUMN account.balance IS 'Текущий баланс';
+        </sql>
+    </changeSet>
+
+    <changeSet id="Create_person_emails_table" author="BurdovitsinAS" created="03.04.2025">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="person_emails"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="person_emails" remarks="E-mail пользователя">
+            <column name="EMAIL_ID" type="BIGINT" autoIncrement="true" remarks="ID e-mail">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="PERSON_ID" type="BIGINT" remarks="ID пользователя">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EMAIL" type="VARCHAR(200)" remarks="E-mail">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="CREATE_DATE" type="TIMESTAMP" defaultValueComputed="${now}" remarks="Дата добавления E-mail">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="DELETE_DATE" type="TIMESTAMP" remarks="Дата удаления E-mail"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="Comment_person_emails_table" author="BurdovitsinAS" created="03.04.2025">
+        <preConditions onFail="CONTINUE">
+            <tableExists tableName="person_emails"/>
+        </preConditions>
+        <sql>
+            COMMENT
+            ON TABLE person_emails IS 'E-mail пользователя';
+            COMMENT
+            ON COLUMN person_emails.email_id IS 'ID e-mail';
+            COMMENT
+            ON COLUMN person_emails.person_id IS 'ID пользователя';
+            COMMENT
+            ON COLUMN person_emails.email IS 'E-mail';
+            COMMENT
+            ON COLUMN person_emails.create_date IS 'Время добавления E-mail';
+            COMMENT
+            ON COLUMN person_emails.delete_date IS 'Время удаления E-mail';
+        </sql>
+    </changeSet>
+
+    <changeSet id="Create_person_phones_table" author="BurdovitsinAS" created="03.04.2025">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="person_phones"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="person_phones">
+            <column name="PHONE_ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="PERSON_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PHONE" type="VARCHAR(13)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="CREATE_DATE" type="TIMESTAMP" defaultValueComputed="${now}"
+                    remarks="Дата добавления телефона">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="DELETE_DATE" type="TIMESTAMP" remarks="Дата удаления телефона"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="Comment_person_phones_table" author="BurdovitsinAS" created="03.04.2025">
+        <preConditions onFail="CONTINUE">
+            <tableExists tableName="person_phones"/>
+        </preConditions>
+        <sql>
+            COMMENT
+            ON TABLE person_phones IS 'Список телефонов';
+            COMMENT
+            ON COLUMN person_phones.phone_id IS 'ID телефона';
+            COMMENT
+            ON COLUMN person_phones.person_id IS 'ID пользователя';
+            COMMENT
+            ON COLUMN person_phones.phone IS 'Номер телефона';
+            COMMENT
+            ON COLUMN person_phones.create_date IS 'Дата добавления телефона';
+            COMMENT
+            ON COLUMN person_phones.delete_date IS 'Дата удаления телефона';
+        </sql>
+    </changeSet>
+
+    <changeSet id="Create_main_seq" author="Alexander Burdovitsin" created="03.04.2025">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="main_sequence"/>
+            </not>
+        </preConditions>
+        <createSequence sequenceName="main_sequence" startValue="1"/>
+    </changeSet>
+</databaseChangeLog>
